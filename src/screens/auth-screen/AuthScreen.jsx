@@ -10,6 +10,11 @@ import {
 import LogoImg from "../../assets/logo.svg";
 import ImageEl from "../../components/utils/ImageEl";
 import { useState } from "react";
+import { auth } from "../../firebase.js";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 
 const initForm = {
   email: "",
@@ -17,6 +22,7 @@ const initForm = {
 };
 
 const AuthScreen = () => {
+  const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState(initForm);
 
@@ -31,9 +37,22 @@ const AuthScreen = () => {
     }));
   };
 
-  const handleAuth = async () => {};
+  const handleAuth = async () => {
+    try {
+      setLoading(true);
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, form.email, form.password);
+      } else {
+        await createUserWithEmailAndPassword(auth, form.email, form.password);
+      }
+    } catch (error) {
+      const msg = error.code.split("auth/")[1].split("-").join(" ");
+      console.log(msg);
+      setLoading(false);
+    }
+  };
 
-  console.log(form);
+  // console.log(form);
 
   return (
     <Container
@@ -64,7 +83,7 @@ const AuthScreen = () => {
           label="Password"
         />
         <Button
-          disabled={!form.email.trim() || !form.password.trim()}
+          disabled={loading || !form.email.trim() || !form.password.trim()}
           onClick={handleAuth}
           size="large"
           variant="contained"
