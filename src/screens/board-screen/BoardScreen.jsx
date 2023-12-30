@@ -1,9 +1,15 @@
-import React from 'react'
+import React from "react";
+import TopBar from "./TopBar";
+import CreateBoardModal from "./CreateBoardModal";
 
 const BoardScreen = () => {
   return (
-    <div>BoardScreen</div>
-  )
-}
+    <>
+      <TopBar />
+      <h1>hello</h1>
+      <CreateBoardModal />
+    </>
+  );
+};
 
-export default BoardScreen
+export default BoardScreen;
