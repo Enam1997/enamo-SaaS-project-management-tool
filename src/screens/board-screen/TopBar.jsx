@@ -3,15 +3,23 @@ import React from "react";
 import ImageEl from "../../components/utils/ImageEl";
 import LogoImg from "../../assets/logo.svg";
 import { ExitToApp } from "@mui/icons-material";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
 
-const TopBar = () => {
+const TopBar = ({ openmodal }) => {
   return (
     <AppBar position="static">
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <ImageEl height={"25px"} src={LogoImg} alt="Enamo" />
         <Stack direction="row" spacing={2}>
-          <Button variant="contained">Create Board</Button>
-          <Button startIcon={<ExitToApp />} color="inherit">
+          <Button onClick={openmodal} variant="contained">
+            Create Board
+          </Button>
+          <Button
+            onClick={() => signOut(auth)}
+            startIcon={<ExitToApp />}
+            color="inherit"
+          >
             Logout
           </Button>
         </Stack>

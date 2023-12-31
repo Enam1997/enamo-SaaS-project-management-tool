@@ -10,6 +10,7 @@ import AppLoader from "./components/layout/AppLoader.jsx";
 import PublicOnlyRoute from "./components/utils/PublicOnlyRoute.jsx";
 import BoardScreen from "./screens/board-screen/BoardScreen.jsx";
 import PrivateRoute from "./components/utils/PrivateRoute.jsx";
+import SnackBarManager from "./components/layout/SnackBarManager.jsx";
 
 const App = () => {
   const { loader, setLoginStatus } = useStore();
@@ -27,7 +28,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
+      <SnackBarManager />
       <BrowserRouter>
         <Routes>
           <Route
