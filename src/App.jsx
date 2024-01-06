@@ -8,16 +8,16 @@ import { onAuthStateChanged } from "firebase/auth";
 import useStore from "./store.js";
 import AppLoader from "./components/layout/AppLoader.jsx";
 import PublicOnlyRoute from "./components/utils/PublicOnlyRoute.jsx";
-import BoardScreen from "./screens/board-screen/BoardScreen.jsx";
+import BoardsScreen from "./screens/boards-screen/BoardsScreen.jsx";
 import PrivateRoute from "./components/utils/PrivateRoute.jsx";
 import SnackBarManager from "./components/layout/SnackBarManager.jsx";
+import BoardScreen from "./screens/board-screnn/BoardScreen.jsx";
 
 const App = () => {
   const { loader, setLoginStatus } = useStore();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      console.log(user);
       setLoginStatus(!!user);
     });
     return () => unsub();
@@ -37,6 +37,10 @@ const App = () => {
           />
           <Route
             path="/boards"
+            element={<PrivateRoute Component={BoardsScreen} />}
+          />
+          <Route
+            path="/boards/:boardId"
             element={<PrivateRoute Component={BoardScreen} />}
           />
         </Routes>

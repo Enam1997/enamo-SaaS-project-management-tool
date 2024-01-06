@@ -5,6 +5,9 @@ import {
   getDocs,
   query,
   orderBy,
+  doc,
+  getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../firebase";
@@ -15,18 +18,41 @@ const useApp = () => {
     currentUser: { uid },
   } = getAuth();
 
-  const boardColRef = collection(db, `users/${uid}/boards`);
-
+  const boarsdColRef = collection(db, `users/${uid}/boards`);
   const { setBoards, addBoard } = useStore();
+
+  const updateBoardData = async (boardId, tabs) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${boardId}`);
+    try {
+      await updateDoc(docRef, { tabs, lastUpdated: serverTimestamp() });
+    } catch (error) {}
+  };
+
+  const fetchBoard = async (boardId) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${boardId}`);
+    try {
+      const doc = await getDoc(docRef);
+      if (doc.exists) {
+        return doc.data();
+      } else return null;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const createBoard = async ({ name, color }) => {
     try {
-      await addDoc(boardColRef, {
+      const doc = await addDoc(boarsdColRef, {
         name,
         color,
         createdAt: serverTimestamp(),
       });
-      addBoard({ name, color, createdAt: new Date().toLocaleDateString() });
+      addBoard({
+        name,
+        color,
+        createdAt: new Date().toLocaleDateString(),
+        id: doc.id,
+      });
     } catch (error) {
       console.log(error);
       throw error;
@@ -35,12 +61,12 @@ const useApp = () => {
 
   const fetchBoards = async (setLoading) => {
     try {
-      const q = query(boardColRef, orderBy("createdAt", "desc"));
+      const q = query(boarsdColRef, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const boards = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
-        createdAt: doc.data().createdAt.toDate().toLocaleDateString(),
+        createdAt: doc.data().createdAt.toDate().toLocaleString("en-US"),
       }));
       setBoards(boards);
     } catch (error) {
@@ -50,7 +76,7 @@ const useApp = () => {
     }
   };
 
-  return { createBoard, fetchBoards };
+  return { createBoard, fetchBoards, fetchBoard, updateBoardData };
 };
 
 export default useApp;
