@@ -8,24 +8,31 @@ import {
   doc,
   getDoc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../firebase";
 import useStore from "../store";
+import { useNavigate } from "react-router-dom";
 
 const useApp = () => {
   const {
     currentUser: { uid },
   } = getAuth();
 
+  const navigate = useNavigate();
+
   const boarsdColRef = collection(db, `users/${uid}/boards`);
-  const { setBoards, addBoard } = useStore();
+  const { boards, setBoards, addBoard, setToastr } = useStore();
 
   const updateBoardData = async (boardId, tabs) => {
     const docRef = doc(db, `users/${uid}/boardsData/${boardId}`);
     try {
       await updateDoc(docRef, { tabs, lastUpdated: serverTimestamp() });
-    } catch (error) {}
+    } catch (error) {
+      setToastr("Error upadating Board");
+      throw error;
+    }
   };
 
   const fetchBoard = async (boardId) => {
@@ -36,7 +43,8 @@ const useApp = () => {
         return doc.data();
       } else return null;
     } catch (error) {
-      console.log(error);
+      setToastr("Error Fetching Board");
+      throw error;
     }
   };
 
@@ -54,7 +62,7 @@ const useApp = () => {
         id: doc.id,
       });
     } catch (error) {
-      console.log(error);
+      setToastr("Error Creating Board");
       throw error;
     }
   };
@@ -70,13 +78,30 @@ const useApp = () => {
       }));
       setBoards(boards);
     } catch (error) {
-      console.log(error);
+      setToastr("Error Fetching Boards");
     } finally {
       if (setLoading) setLoading(false);
     }
   };
 
-  return { createBoard, fetchBoards, fetchBoard, updateBoardData };
+  const deleteBoard = async (boardId) => {
+    try {
+      const docRef = doc(db, `users/${uid}/boards/${boardId}`);
+      // delete board form db
+      await deleteDoc(docRef);
+      const tempBoards = boards.filter((board) => board.id !== boardId);
+      // update board to store
+      setBoards(tempBoards);
+
+      // Navigat the user to boards screen
+      navigate("/boards");
+    } catch (error) {
+      setToastr("Error delting the board");
+      throw error;
+    }
+  };
+
+  return { createBoard, fetchBoards, fetchBoard, updateBoardData, deleteBoard };
 };
 
 export default useApp;

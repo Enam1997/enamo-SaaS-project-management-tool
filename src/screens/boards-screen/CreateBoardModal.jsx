@@ -12,17 +12,25 @@ import React, { useState } from "react";
 import ModalHeader from "../../components/layout/ModalHeader";
 import { colors } from "../../theme";
 import useApp from "../../hooks/useApp";
+import useStore from "../../store";
 
 const CreateBoardModal = ({ closeModal }) => {
   const { createBoard } = useApp();
   const [name, setName] = useState("");
   const [color, setColor] = useState(0);
   const [loading, setLoading] = useState(false);
+  const { setToastr } = useStore();
 
   const handleCreate = async () => {
+    const tempName = name.trim();
+
+    if (!tempName) return setToastr("Board name cant not Empty");
+    if (!/^[a-zA-Z0-9\s]{1,20}$/.test(tempName))
+      return setToastr("Board name can't be special charectar or more than 20 char");
+
     try {
       setLoading(true);
-      await createBoard({ name, color });
+      await createBoard({ name: tempName, color });
       closeModal();
     } catch (error) {
       setLoading(false);

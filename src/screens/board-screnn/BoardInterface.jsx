@@ -6,8 +6,9 @@ import useApp from "../../hooks/useApp";
 import useStore from "../../store";
 import { DragDropContext } from "react-beautiful-dnd";
 import AppLoader from "../../components/layout/AppLoader";
+import ShiftTaskModal from "./ShiftTaskModal";
 
-const statusMap = {
+export const statusMap = {
   todos: "Todos",
   inProgress: "In Progress",
   completed: "Completed",
@@ -15,6 +16,7 @@ const statusMap = {
 
 const BoardInterface = ({ boardData, boardId, updateLastUpdated }) => {
   const [loading, setLoading] = useState(false);
+  const [shiftTask, setShiftTask] = useState(null);
   const [addTaskTo, setAddTaskTo] = useState("");
   const [tabs, setTab] = useState(structuredClone(boardData));
   const { updateBoardData } = useApp();
@@ -24,16 +26,42 @@ const BoardInterface = ({ boardData, boardId, updateLastUpdated }) => {
     setAddTaskTo(status);
   }, []);
 
+  const handleOpenShiftTaskModal = useCallback((task) => {
+    setShiftTask(task);
+  }, []);
+
+  const handleShiftTaskWithModal = async (newStatus) => {
+    const dClone = structuredClone(tabs);
+    const oldStatus = shiftTask.status;
+    if (newStatus === oldStatus) return setShiftTask(null);
+    const [task] = dClone[oldStatus].splice(shiftTask.index, 1);
+    dClone[newStatus].unshift(task);
+    try {
+      setLoading(true);
+      await handleUpdateBoardData(dClone);
+      setShiftTask(null);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateBoardData = async (dClone) => {
+    setLoading(true);
+    await updateBoardData(boardId, dClone);
+    setTab(dClone);
+    updateLastUpdated();
+    setToastr("Board Updated");
+  };
+
   const handleAddTask = async (text) => {
     if (!text.trim()) return setToastr("Please wite Board name");
     const dClone = structuredClone(tabs);
     dClone[addTaskTo].unshift({ text, id: crypto.randomUUID() });
     try {
-      setLoading(true);
-      await updateBoardData(boardId, dClone);
-      setTab(dClone);
+      await handleUpdateBoardData(dClone);
       setAddTaskTo("");
-      updateLastUpdated();
     } catch (error) {
       console.log(error);
     } finally {
@@ -47,10 +75,7 @@ const BoardInterface = ({ boardData, boardId, updateLastUpdated }) => {
       const taskIdx = dClone[tab].findIndex((t) => t.id === taskId);
       dClone[tab].splice(taskIdx, 1);
       try {
-        setLoading(true);
-        await updateBoardData(boardId, dClone);
-        setTab(dClone);
-        updateLastUpdated();
+        await handleUpdateBoardData(dClone);
       } catch (error) {
         console.log(error);
       } finally {
@@ -77,10 +102,7 @@ const BoardInterface = ({ boardData, boardId, updateLastUpdated }) => {
     dClone[destination.droppableId].splice(destination.index, 0, draggedTask);
 
     try {
-      setLoading(true);
-      await updateBoardData(boardId, dClone);
-      setTab(dClone);
-      updateLastUpdated();
+      await handleUpdateBoardData(dClone);
     } catch (error) {
       console.log(error);
     } finally {
@@ -92,6 +114,13 @@ const BoardInterface = ({ boardData, boardId, updateLastUpdated }) => {
 
   return (
     <>
+      {!!shiftTask && (
+        <ShiftTaskModal
+          shiftTask={handleShiftTaskWithModal}
+          onClose={() => setShiftTask(null)}
+          task={shiftTask}
+        />
+      )}
       {!!addTaskTo && (
         <AddTaskModal
           tabName={statusMap[addTaskTo]}
@@ -108,6 +137,7 @@ const BoardInterface = ({ boardData, boardId, updateLastUpdated }) => {
               name={statusMap[status]}
               status={status}
               openAddTaskModal={handleOpenAddTaskModal}
+              openShiftTaskModal={handleOpenShiftTaskModal}
               removeTask={handleRemoveTask}
             />
           ))}

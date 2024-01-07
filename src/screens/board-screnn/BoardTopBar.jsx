@@ -1,10 +1,18 @@
-import React from "react";
+import React, { memo } from "react";
 import { ArrowBack, Delete } from "@mui/icons-material";
-import { AppBar, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  IconButton,
+  Stack,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { colors } from "../../theme";
 
-const BoardTopBar = ({ name, lastUpdated, color }) => {
+const BoardTopBar = ({ name, lastUpdated, color, deleteBoard }) => {
+  const isXs = useMediaQuery((theme) => theme.breakpoints.only("xs"));
   const navigate = useNavigate();
 
   return (
@@ -20,8 +28,10 @@ const BoardTopBar = ({ name, lastUpdated, color }) => {
           <Typography variant="h6">{name}</Typography>
         </Stack>
         <Stack spacing={2} alignItems={"center"} direction={"row"}>
-          <Typography variant="body2">Last Updated: {lastUpdated}</Typography>
-          <IconButton>
+          <Typography display={{ xs: "none", sm: "block" }} variant="body2">
+            Last Updated: {lastUpdated}
+          </Typography>
+          <IconButton onClick={deleteBoard}>
             <Delete />
           </IconButton>
         </Stack>
@@ -30,4 +40,4 @@ const BoardTopBar = ({ name, lastUpdated, color }) => {
   );
 };
 
-export default BoardTopBar;
+export default memo(BoardTopBar);

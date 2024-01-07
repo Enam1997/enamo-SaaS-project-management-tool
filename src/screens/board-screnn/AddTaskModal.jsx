@@ -9,24 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import ModalHeader from "../../components/layout/ModalHeader";
 
 const AddTaskModal = ({ tabName, onClose, addTask }) => {
   const [text, setText] = useState("");
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="xs">
       <Stack p={2}>
-        <Stack
-          direction={"row"}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-          mb={3}
-        >
-          <Typography variant="h6">Add Task</Typography>
-          <IconButton onClick={onClose}>
-            <Close />
-          </IconButton>
-        </Stack>
-        <Stack spacing={2}>
+        <ModalHeader title="Add Task" onClose={onClose} />
+        <Stack mt={3} spacing={2}>
           <Stack direction={"row"} alignItems="center" spacing={1}>
             <Typography>Status:</Typography>
             <Chip size="small" label={tabName} />

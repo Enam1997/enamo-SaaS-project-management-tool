@@ -5,10 +5,9 @@ import { colors } from "../../theme";
 import { useNavigate } from "react-router-dom";
 
 const BoardItemCard = ({ name, color, createdAt, id }) => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
-    <Grid item xs={3}>
+    <Grid item xs={12} sm={3}>
       <Stack
         p={2}
         bgcolor={"background.paper"}
@@ -31,7 +30,7 @@ const BoardItemCard = ({ name, color, createdAt, id }) => {
               {name}
             </Typography>
           </Box>
-          <IconButton onClick={()=>navigate(`/boards/${id}`)} size="small">
+          <IconButton onClick={() => navigate(`/boards/${id}`)} size="small">
             <Launch />
           </IconButton>
         </Stack>
