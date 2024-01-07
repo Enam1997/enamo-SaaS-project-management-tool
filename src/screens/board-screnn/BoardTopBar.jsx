@@ -17,7 +17,7 @@ const BoardTopBar = ({ name, lastUpdated, color, deleteBoard }) => {
 
   return (
     <AppBar
-      position="static"
+      position='sticky'
       sx={{ borderBottom: "5px solid", borderColor: colors[color] }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>

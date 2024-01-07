@@ -7,7 +7,7 @@ import {
   TextField,
 } from "@mui/material";
 
-import LogoImg from "../../assets/logo.svg";
+import LogoImg from "../../assets/Enamo.png";
 import ImageEl from "../../components/utils/ImageEl";
 import { useState } from "react";
 import { auth } from "../../firebase.js";
@@ -65,7 +65,7 @@ const AuthScreen = () => {
       }}
     >
       <Stack mb={6} spacing={4} alignItems="center" textAlign="center">
-        <ImageEl src={LogoImg} alt="Enamo" />
+        <ImageEl height={"45px"} src={LogoImg} alt="Enamo" />
         <Typography color="rgba(255,255,255, .6)">
           Visualize Your Workflow for Increased Productivity.
           <br />

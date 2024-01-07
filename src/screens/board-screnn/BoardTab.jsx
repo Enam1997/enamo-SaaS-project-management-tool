@@ -40,7 +40,7 @@ const BoardTab = ({
                 {name}
               </Typography>
               <IconButton onClick={() => openAddTaskModal(status)}>
-                <AddCircleOutline fontSize="small" />
+                <AddCircleOutline />
               </IconButton>
             </Stack>
             <Stack mt={3} spacing={2}>
